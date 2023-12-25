@@ -1090,6 +1090,7 @@ int divide4(const number *a, const number *b, number *c, number *d)
                 d->n[i] = 0;
             }
         }
+
         divide(&A, d, &e, &A);
 
         if (da - db >= 1)
