@@ -6,9 +6,10 @@
 
 int main(void)
 {
-    int order;
+    int order, i;
     double start_clock, end_clock;
     number arctan, term, tmp, pi;
+    FILE *fp;
 
     order = 1005;
 
@@ -62,4 +63,15 @@ int main(void)
     dispNumber(&pi);
     printf("digit: %d\n", getDigit(&pi));
     printf("time: %f\n", end_clock - start_clock);
+
+    fp = fopen("pi.txt", "w");
+
+    for (i = getDigit(&pi) - 1; i >= 0; i--)
+    {
+        fputc('0' + pi.n[i], fp);
+    }
+
+    fclose(fp);
+
+    return 0;
 }
