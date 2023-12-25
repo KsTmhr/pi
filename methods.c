@@ -1058,15 +1058,15 @@ int divide3(const number *a, const number *b, number *c, number *d)
 //
 int divide4(const number *a, const number *b, number *c, number *d)
 {
-    int i, da, da2, db, cnt;
+    int i, da, da2, db, cnt, signTmp;
     number A, B, e, tmp, d2;
 
     if (isZero(b) == 0)
         return -1;
 
+    signTmp = getSign(a);
     getAbs(a, &A);
     getAbs(b, &B);
-
     clearByZero(c);
 
     db = getDigit(&B);
@@ -1106,12 +1106,12 @@ int divide4(const number *a, const number *b, number *c, number *d)
     if (isZero(c) == 0)
         setSign(c, 1);
     else
-        setSign(c, getSign(a) * getSign(b));
+        setSign(c, signTmp * getSign(b));
 
     if (isZero(d) == 0)
         setSign(d, 1);
     else
-        setSign(d, getSign(a));
+        setSign(d, signTmp);
 
     return 0;
 }
@@ -1242,55 +1242,7 @@ int myCos(const number *theta, number *a)
 //
 int arcTan2(const number *x, number *a, int order)
 {
-    int i, sign;
-    number n, xp2, N, M, tmp, abs, two;
-
-    setInt(a, 0);
-    setInt(&n, 1);
-    setInt(&two, 2);
-
-    // 1 * 10^order
-    clearByZero(&N);
-    N.n[order] = 1;
-
-    // xp2 = x^2
-    copyNumber(x, &xp2);
-    multiple(&xp2, x, &xp2);
-
-    // N = 1 * 10^order / x
-    divide3(&N, x, &N, &tmp);
-    copyNumber(&N, &M);
-
-    sign = 1;
-
-    getAbs(&M, &abs);
-    while (isZero(&abs) == -1)
-    {
-        // a += M
-        add(a, &M, a);
-
-        // N = (1 * 10^order / x) / x^2
-        divide3(&N, &xp2, &N, &tmp);
-
-        // n += 2
-        add(&n, &two, &n);
-
-        // M = N / n
-        divide3(&N, &n, &M, &tmp);
-
-        sign *= -1;
-        setSign(&M, sign);
-
-        // abs = |M|
-        getAbs(&M, &abs);
-    }
-
-    return 0;
-}
-
-int arcTan(const number *x, number *a, int order)
-{
-    int i, sign;
+    int i, sign, cnt;
     number n, xp2, N, M, tmp, abs, two;
 
     setInt(a, 0);
@@ -1311,6 +1263,7 @@ int arcTan(const number *x, number *a, int order)
 
     sign = 1;
 
+    cnt = 0;
     getAbs(&M, &abs);
     while (isZero(&abs) == -1)
     {
@@ -1331,7 +1284,57 @@ int arcTan(const number *x, number *a, int order)
 
         // abs = |M|
         getAbs(&M, &abs);
+        cnt++;
     }
+    printf("cnt:%d\n", cnt);
+
+    return 0;
+}
+
+int arcTan(const number *x, number *a, int order)
+{
+    int i, cnt;
+    number n, xp2, N, M, tmp, abs, two;
+
+    setInt(a, 0);
+    setInt(&n, 1);
+    setInt(&two, 2);
+
+    // 1 * 10^order
+    clearByZero(&N);
+    N.n[order] = 1;
+
+    // xp2 = x^2
+    copyNumber(x, &xp2);
+    multiple(&xp2, x, &xp2);
+
+    // N = 1 * 10^order / x
+    divide4(&N, x, &N, &tmp);
+
+    cnt = 0;
+    getAbs(&N, &abs);
+    while (isZero(&abs) == -1)
+    {
+        // a += M
+        add(a, &N, a);
+
+        multiple(&N, &n, &N);
+
+        // n += 2
+        add(&n, &two, &n);
+
+        multiple(&n, &xp2, &M);
+
+        // M = N / n
+        divide4(&N, &M, &N, &tmp);
+
+        setSign(&N, getSign(&N) * -1);
+
+        // abs = |M|
+        getAbs(&N, &abs);
+        cnt++;
+    }
+    printf("cnt:%d\n", cnt);
 
     return 0;
 }
