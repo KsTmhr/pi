@@ -104,6 +104,10 @@ int getDigit(const number *a)
     {
         num--;
     }
+    if (a->n[num] == 0 && num == 0)
+    {
+        num--;
+    }
     return num + 1;
 }
 
@@ -128,7 +132,9 @@ int getDigitOfInt(const int x)
 //
 void dispNumberZeroSuppress(const number *a)
 {
-    int i;
+    int i, dgt;
+
+    dgt = getDigit(a);
 
     if (getSign(a) == -1)
     {
@@ -139,9 +145,14 @@ void dispNumberZeroSuppress(const number *a)
         putchar('+');
     }
 
-    for (i = getDigit(a) - 1; i >= 0; i--)
+    for (i = dgt - 1; i >= 0; i--)
     {
         printf("%d", a->n[i]);
+    }
+
+    if (dgt == 0)
+    {
+        putchar('0');
     }
 }
 
@@ -1058,51 +1069,70 @@ int divide3(const number *a, const number *b, number *c, number *d)
 //
 int divide4(const number *a, const number *b, number *c, number *d)
 {
-    int i, da, da2, db, cnt, signTmp;
-    number A, B, e, tmp, d2;
+    int i, j, da, dA, db, df, dd, cnt, signTmp;
+    number A, A2, B, e, tmp, d2;
 
     if (isZero(b) == 0)
         return -1;
 
+    da = getDigit(a);
+    db = getDigit(b);
+    dA = db;
+    df = 0;
+
     signTmp = getSign(a);
-    getAbs(a, &A);
+    clearByZero(&A);
+    getAbs(a, &A2);
     getAbs(b, &B);
     clearByZero(c);
+    clearByZero(d);
+    clearByZero(&e);
 
-    db = getDigit(&B);
-
-    while (numComp(&A, &B) != -1)
+    j = da - 1;
+    while (j >= 0)
     {
-        copyNumber(&B, d);
+        dd = getDigit(d);
 
-        da = getDigit(&A);
-        if (da == da2)
+        if (dd == dA)
         {
-            da--;
+            dA = db + 1;
         }
-        da2 = da;
-
-        if (da - db >= 1)
+        else
         {
-            for (i = db - 1; i >= 0; i--)
+            dA = db;
+            A.n[db] = 0;
+        }
+
+        for (i = dA - 1; i >= dA - dd; i--)
+        {
+            A.n[i] = d->n[i - dA + dd];
+            // printf("i: %d, d-> A.n[i]: %d\n", i, i - dA + dd);
+        }
+        for (i; i >= 0; i--)
+        {
+            A.n[i] = A2.n[j];
+            A2.n[j] = 0;
+            // printf("i: %d, a-> A.n[i]: %d\n", i, A.n[i]);
+            j--;
+            if (j < 0)
             {
-                d->n[i + da - db] = d->n[i];
-                d->n[i] = 0;
+                break;
             }
         }
 
-        divide(&A, d, &e, &A);
+        divide(&A, &B, &e, d);
 
-        if (da - db >= 1)
+        df += dA - dd;
+
+        if (da - df > 0)
         {
-            e.n[da - db] = e.n[0];
+            e.n[da - df] = e.n[0];
             e.n[0] = 0;
         }
 
         add(c, &e, c);
+        // printf("da: %d, db: %d, dd: %d, dA: %d, df: %d, j: %d\n", da, db, dd, dA, df, j);
     }
-
-    copyNumber(&A, d);
 
     if (isZero(c) == 0)
         setSign(c, 1);

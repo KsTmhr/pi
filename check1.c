@@ -11,7 +11,7 @@ int main(void)
     double start_clock, end_clock;
     number a, b, c, d;
 
-    x = 11018;
+    x = 28;
     order = 21;
     setInt(&a, x);
     setInt(&b, 0);
