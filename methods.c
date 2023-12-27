@@ -1067,7 +1067,7 @@ int divide3(const number *a, const number *b, number *c, number *d)
 //
 // Maybe fastest
 //
-int divide4(const number *a, const number *b, number *c, number *d)
+int divide5(const number *a, const number *b, number *c, number *d)
 {
     int i, j, da, dA, db, df, dd, cnt, signTmp;
     number A, A2, B, e, tmp, d2;
